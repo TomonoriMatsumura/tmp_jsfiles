@@ -7,9 +7,9 @@ pipeline {
   environment {
     ANSIBLE_PLAYBOOK = 'ansible_install'
 
-    INVENTORY = credentials('node1_ansible_inventory')
+    INVENTORY = credentials('node2_ansible_inventory')
 
-    WORKING_DIR = "/home/ansible/.jenkins/node1_${env.ANSIBLE_PLAYBOOK}"
+    WORKING_DIR = "/home/ansible/.jenkins/node2_${env.ANSIBLE_PLAYBOOK}"
   }
 
   stages {

@@ -7,7 +7,7 @@ pipeline {
   environment {
     ANSIBLE_PLAYBOOK = 'wordpress_install'
 
-    INVENTORY = credentials('node1_ansible_inventory')
+    INVENTORY = credentials('node2_ansible_inventory')
 
     MARIADB_ROOT_PASSWORD = credentials('ansible_mariadb_root_password')
 
@@ -25,7 +25,7 @@ pipeline {
                   -e 'wp_install_dir=wordpress/solution-log' \
                   -e 'mariadb_root_password=${env.MARIADB_ROOT_PASSWORD}' \
                   -e '{ \"requires\": [ { \"${env.REQUIRE_HOST_1}\": \"Require host ${env.REQUIRE_HOST_1}\" }, { \"${env.REQUIRE_HOST_2}\": \"Require host ${env.REQUIRE_HOST_2}\" } ] }'"
-    WORKING_DIR = "/home/ansible/.jenkins/node1_${env.ANSIBLE_PLAYBOOK}"
+    WORKING_DIR = "/home/ansible/.jenkins/node2_${env.ANSIBLE_PLAYBOOK}"
   }
 
   stages {

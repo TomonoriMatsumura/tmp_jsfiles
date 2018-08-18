@@ -7,9 +7,9 @@ pipeline {
   environment {
     AD_HOC_COMMAND = "-m shell -a 'google-chrome --version'"
 
-    INVENTORY = credentials('node1_ansible_inventory')
+    INVENTORY = credentials('node2_ansible_inventory')
 
-    WORKING_DIR = "/home/ansible/.jenkins/node1_ad-hoc"
+    WORKING_DIR = "/home/ansible/.jenkins/node2_ad-hoc"
   }
 
   stages {

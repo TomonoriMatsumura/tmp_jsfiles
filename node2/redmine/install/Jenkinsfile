@@ -6,9 +6,9 @@ pipeline {
 
   environment {
 
-    ANSIBLE_HOST = credentials('node1_ip_address')
+    ANSIBLE_HOST = credentials('node2_ip_address')
 
-    ANSIBLE_HOST_PASSWORD = credentials('node1_password')
+    ANSIBLE_HOST_PASSWORD = credentials('node2_password')
 
     ANSIBLE_PORT = credentials('ansible_port')
 
@@ -18,11 +18,11 @@ pipeline {
 
     REQUIRE_HOST_2 = credentials('require_host_2')
 
-    WORKING_DIR = "/home/ansible/.jenkins/node1_redmine_install"
+    WORKING_DIR = "/home/ansible/.jenkins/node2_redmine_install"
 
     VAR_YAML = "${env.WORKING_DIR}/vars/redmine/install/default.yml"
 
-    PLAYBOOK = "${env.WORKING_DIR}/jenkinsfiles/node1/redmine/install/ansible-playbook.sh"
+    PLAYBOOK = "${env.WORKING_DIR}/jenkinsfiles/node2/redmine/install/ansible-playbook.sh"
   }
 
   stages {

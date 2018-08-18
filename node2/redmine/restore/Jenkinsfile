@@ -6,9 +6,9 @@ pipeline {
 
   environment {
 
-    ANSIBLE_HOST = credentials('node1_ip_address')
+    ANSIBLE_HOST = credentials('node2_ip_address')
 
-    ANSIBLE_HOST_PASSWORD = credentials('node1_password')
+    ANSIBLE_HOST_PASSWORD = credentials('node2_password')
 
     ANSIBLE_PORT = credentials('ansible_port')
 
@@ -16,11 +16,11 @@ pipeline {
 
     BACKUP_DATA_DIR = "/home/ansible/redmine-backup"
 
-    WORKING_DIR = "/home/ansible/.jenkins/node1_redmine_restore"
+    WORKING_DIR = "/home/ansible/.jenkins/node2_redmine_restore"
 
     VAR_YAML = "${env.WORKING_DIR}/vars/redmine/restore/default.yml"
 
-    PLAYBOOK = "${env.WORKING_DIR}/jenkinsfiles/node1/redmine/restore/ansible-playbook.sh"
+    PLAYBOOK = "${env.WORKING_DIR}/jenkinsfiles/node2/redmine/restore/ansible-playbook.sh"
   }
 
   stages {

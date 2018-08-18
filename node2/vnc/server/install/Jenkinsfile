@@ -7,7 +7,7 @@ pipeline {
   environment {
     ANSIBLE_PLAYBOOK = 'vnc_server_install'
 
-    INVENTORY = credentials('node1_ansible_inventory')
+    INVENTORY = credentials('node2_ansible_inventory')
 
     VNC_ACCOUNT = credentials('ansible_vnc_account')
 
@@ -18,7 +18,7 @@ pipeline {
     EXTRA_ARGS = "-e 'vnc_user=${env.VNC_USER}' \
                   -e 'vnc_password=${env.VNC_PASSWORD}'"
 
-    WORKING_DIR = "/home/ansible/.jenkins/node1_${env.ANSIBLE_PLAYBOOK}"
+    WORKING_DIR = "/home/ansible/.jenkins/node2_${env.ANSIBLE_PLAYBOOK}"
   }
 
   stages {

@@ -5,7 +5,7 @@ pipeline {
   agent any
 
   environment {
-    HOST = credentials('node1_ip_address')
+    HOST = credentials('node2_ip_address')
 
     TEST_URL = "http://${env.HOST}/wordpress/catch_up"
   }

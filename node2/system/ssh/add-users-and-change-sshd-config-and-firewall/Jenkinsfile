@@ -7,7 +7,7 @@ pipeline {
   environment {
     ANSIBLE_PLAYBOOK = "system_ssh_add-users-and-change-sshd-config-and-firewall"
 
-    WORKING_DIR = "/home/ansible/.jenkins/node1_${env.ANSIBLE_PLAYBOOK}"
+    WORKING_DIR = "/home/ansible/.jenkins/node2_${env.ANSIBLE_PLAYBOOK}"
 
     VAULT_PASSWORD_FILE = credentials('ansible_vault_password_file')
   }
@@ -31,7 +31,7 @@ pipeline {
                             ),
                             file(
                               variable: 'INVENTORY',
-                              credentialsId: 'node1_ansible_inventory_ssh'
+                              credentialsId: 'node2_ansible_inventory_ssh'
                             ),
                             string(
                               variable: 'REDMINE_IP',

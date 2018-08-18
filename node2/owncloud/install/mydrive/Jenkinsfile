@@ -7,7 +7,7 @@ pipeline {
   environment {
     ANSIBLE_PLAYBOOK = 'owncloud_install'
 
-    INVENTORY = credentials('node1_ansible_inventory')
+    INVENTORY = credentials('node2_ansible_inventory')
 
     REQUIRE_HOST_1 = credentials('require_host_1')
 
@@ -20,7 +20,7 @@ pipeline {
                   -e 'oc_install_dir=/var/www/html/mydrive' \
                   -e 'httpd_conf_confd=oc_mydrive.conf' \
                   -e '{ \"requires\": [ { \"${env.REQUIRE_HOST_1}\": \"Require host ${env.REQUIRE_HOST_1}\" }, { \"${env.REQUIRE_HOST_2}\": \"Require host ${env.REQUIRE_HOST_2}\" } ] }'"
-    WORKING_DIR = "/home/ansible/.jenkins/node1_${env.ANSIBLE_PLAYBOOK}"
+    WORKING_DIR = "/home/ansible/.jenkins/node2_${env.ANSIBLE_PLAYBOOK}"
   }
 
   stages {
