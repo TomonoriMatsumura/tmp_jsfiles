@@ -1,0 +1,46 @@
+#!groovy
+
+pipeline {
+
+  agent any
+
+  environment {
+    ANSIBLE_PLAYBOOK = 'owncloud_install'
+
+    INVENTORY = credentials('node1_ansible_inventory')
+
+    REQUIRE_HOST_1 = credentials('require_host_1')
+
+    REQUIRE_HOST_2 = credentials('require_host_2')
+
+    EXTRA_ARGS = "-e 'httpd_conf_confd=oc_owncloud.conf' -e '{ \"requires\": [ { \"${env.REQUIRE_HOST_1}\": \"Require host ${env.REQUIRE_HOST_1}\" }, { \"${env.REQUIRE_HOST_2}\": \"Require host ${env.REQUIRE_HOST_2}\" } ] }'"
+
+    WORKING_DIR = "/home/ansible/.jenkins/node1_${env.ANSIBLE_PLAYBOOK}"
+  }
+
+  stages {
+    stage('excute ansible-playbook command') {
+      steps {
+        build job: 'ansible/common/excute/playbook',
+          parameters: [
+                        string(
+                          name: 'ANSIBLE_PLAYBOOK',
+                          value: "${env.ANSIBLE_PLAYBOOK}"
+                        ),
+                        credentials(
+                          name: 'INVENTORY',
+                          value: "${env.INVENTORY}"
+                        ),
+                        string(
+                          name: 'WORKING_DIR',
+                          value: "${env.WORKING_DIR}"
+                        ),
+                        string(
+                          name: 'EXTRA_ARGS',
+                          value: "${env.EXTRA_ARGS}"
+                        )
+                      ]
+      }
+    }
+  }
+}

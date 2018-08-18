@@ -1,0 +1,66 @@
+#!groovy
+
+pipeline {
+
+  agent any
+
+  environment {
+    ANSIBLE_PLAYBOOK = "system_ssh_add-users-and-change-sshd-config-and-firewall"
+
+    WORKING_DIR = "/home/ansible/.jenkins/node1_${env.ANSIBLE_PLAYBOOK}"
+
+    VAULT_PASSWORD_FILE = credentials('ansible_vault_password_file')
+  }
+
+  stages {
+    stage('set ansible vault password file') {
+      steps {
+          sh "rm -rf /tmp/vault_password"
+          sh "touch /tmp/vault_password"
+          sh "cat ${env.VAULT_PASSWORD_FILE} > /tmp/vault_password"
+      }
+    }
+
+    stage('excute ansible-playbook command') {
+      steps {
+        withCredentials(
+                          [
+                            string(
+                              variable: 'ANSIBLE_PORT',
+                              credentialsId: 'ansible_port'
+                            ),
+                            file(
+                              variable: 'INVENTORY',
+                              credentialsId: 'node1_ansible_inventory_ssh'
+                            ),
+                            string(
+                              variable: 'REDMINE_IP',
+                              credentialsId: 'app_ip_address'
+                            )
+                          ]
+                       )
+          {
+            build job: 'ansible/common/excute/playbook',
+              parameters: [
+                            string(
+                              name: 'ANSIBLE_PLAYBOOK',
+                              value: "${env.ANSIBLE_PLAYBOOK}"
+                            ),
+                            password(
+                              name: 'EXTRA_ARGS',
+                              value: "--vault-password-file /tmp/vault_password -e 'ssh_port=${env.ANSIBLE_PORT}' -e 'redmine_ip=${env.REDMINE_IP}'"
+                            ),
+                            credentials(
+                              name: 'INVENTORY',
+                              value: "${env.INVENTORY}"
+                            ),
+                            string(
+                              name: 'WORKING_DIR',
+                              value: "${env.WORKING_DIR}"
+                            )
+                          ]
+          }
+      }
+    }
+  }
+}

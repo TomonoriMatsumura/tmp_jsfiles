@@ -1,0 +1,49 @@
+#!groovy
+
+pipeline {
+
+  agent any
+
+  environment {
+    ANSIBLE_PLAYBOOK = 'vnc_server_install'
+
+    INVENTORY = credentials('node1_ansible_inventory')
+
+    VNC_ACCOUNT = credentials('ansible_vnc_account')
+
+    VNC_USER = "${env.VNC_ACCOUNT_USR}"
+
+    VNC_PASSWORD = "${env.VNC_ACCOUNT_PSW}"
+
+    EXTRA_ARGS = "-e 'vnc_user=${env.VNC_USER}' \
+                  -e 'vnc_password=${env.VNC_PASSWORD}'"
+
+    WORKING_DIR = "/home/ansible/.jenkins/node1_${env.ANSIBLE_PLAYBOOK}"
+  }
+
+  stages {
+    stage('excute ansible-playbook command') {
+      steps {
+        build job: 'ansible/common/excute/playbook',
+          parameters: [
+                        string(
+                          name: 'ANSIBLE_PLAYBOOK',
+                          value: "${env.ANSIBLE_PLAYBOOK}"
+                        ),
+                        credentials(
+                          name: 'INVENTORY',
+                          value: "${env.INVENTORY}"
+                        ),
+                        string(
+                          name: 'WORKING_DIR',
+                          value: "${env.WORKING_DIR}"
+                        ),
+                        string(
+                          name: 'EXTRA_ARGS',
+                          value: "${env.EXTRA_ARGS}"
+                        )
+                      ]
+      }
+    }
+  }
+}

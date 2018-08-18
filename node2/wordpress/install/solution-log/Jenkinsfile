@@ -1,0 +1,56 @@
+#!groovy
+
+pipeline {
+
+  agent any
+
+  environment {
+    ANSIBLE_PLAYBOOK = 'wordpress_install'
+
+    INVENTORY = credentials('node1_ansible_inventory')
+
+    MARIADB_ROOT_PASSWORD = credentials('ansible_mariadb_root_password')
+
+    WP_DB_PASSWORD = credentials('ansible_wp_db_password')
+
+    REQUIRE_HOST_1 = credentials('require_host_1')
+
+    REQUIRE_HOST_2 = credentials('require_host_2')
+
+    EXTRA_ARGS = "--skip-tags 'httpd_install,language_php_71_install,rdb_mariadb_install' \
+                  -e 'db_user=wp_solution_log' \
+                  -e 'db_name=wp_solution_log' \
+                  -e 'db_password=${env.WP_DB_PASSWORD}' \
+                  -e 'httpd_conf_confd=wp_solution_log.conf' \
+                  -e 'wp_install_dir=wordpress/solution-log' \
+                  -e 'mariadb_root_password=${env.MARIADB_ROOT_PASSWORD}' \
+                  -e '{ \"requires\": [ { \"${env.REQUIRE_HOST_1}\": \"Require host ${env.REQUIRE_HOST_1}\" }, { \"${env.REQUIRE_HOST_2}\": \"Require host ${env.REQUIRE_HOST_2}\" } ] }'"
+    WORKING_DIR = "/home/ansible/.jenkins/node1_${env.ANSIBLE_PLAYBOOK}"
+  }
+
+  stages {
+    stage('excute ansible-playbook command') {
+      steps {
+        build job: 'ansible/common/excute/playbook',
+          parameters: [
+                        string(
+                          name: 'ANSIBLE_PLAYBOOK',
+                          value: "${env.ANSIBLE_PLAYBOOK}"
+                        ),
+                        credentials(
+                          name: 'INVENTORY',
+                          value: "${env.INVENTORY}"
+                        ),
+                        string(
+                          name: 'WORKING_DIR',
+                          value: "${env.WORKING_DIR}"
+                        ),
+                        string(
+                          name: 'EXTRA_ARGS',
+                          value: "${env.EXTRA_ARGS}"
+                        )
+                      ]
+      }
+    }
+  }
+}

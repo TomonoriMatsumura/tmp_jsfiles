@@ -1,0 +1,75 @@
+#!groovy
+
+pipeline {
+
+  agent any
+
+  environment {
+
+    ANSIBLE_HOST = credentials('node1_ip_address')
+
+    ANSIBLE_HOST_PASSWORD = credentials('node1_password')
+
+    ANSIBLE_PORT = credentials('ansible_port')
+
+    REDMINE_DB_PASS = credentials('redmine_db_password')
+
+    BACKUP_DATA_DIR = "/home/ansible/redmine-backup"
+
+    WORKING_DIR = "/home/ansible/.jenkins/node1_redmine_restore"
+
+    VAR_YAML = "${env.WORKING_DIR}/vars/redmine/restore/default.yml"
+
+    PLAYBOOK = "${env.WORKING_DIR}/jenkinsfiles/node1/redmine/restore/ansible-playbook.sh"
+  }
+
+  stages {
+    stage('Retrive source code from Github') {
+      steps {
+        sh "sudo -u ansible rm -rf ${env.WORKING_DIR}"
+        sh "sudo -u ansible mkdir ${env.WORKING_DIR}"
+        sh "sudo -u ansible git clone https://github.com/TomonoriMatsumura/ansible.git -b topic ${env.WORKING_DIR}"
+      }
+    }
+
+    stage('Create and configure ansible-playbook shellscript file') {
+      steps {
+        sh "sudo -u ansible git clone https://github.com/TomonoriMatsumura/jenkinsfiles ${env.WORKING_DIR}/jenkinsfiles -b topic"
+
+        sh "sudo -u ansible sed -i -e \"s#/WORKDIR#${env.WORKING_DIR}#g\" ${env.PLAYBOOK}"
+
+        sh "sudo -u ansible sed -i -e \"s#example.com:22,#${env.ANSIBLE_HOST}:${env.ANSIBLE_PORT},#g\" ${env.PLAYBOOK}"
+
+        sh "sudo -u ansible sed -i -e \"s#DBPASSWORD#${env.REDMINE_DB_PASS}#g\" ${env.PLAYBOOK}"
+
+        sh "sudo -u ansible sed -i -e \"s#BACKUP_DATA_DIR#${env.BACKUP_DATA_DIR}#g\" ${env.PLAYBOOK}"
+
+        sh "sudo -u ansible sed -i -e \"s#SUPASSWORD#${env.ANSIBLE_HOST_PASSWORD}#g\" ${env.PLAYBOOK}"
+      }
+    }
+
+    stage('excute ansible-playbook command') {
+      steps {
+        sh "sudo -u ansible sh ${env.PLAYBOOK}"
+      }
+    }
+
+stage('Analyze Ansible log and output result') {
+      steps {
+        script {
+
+          def output = sh(
+                          returnStdout: true,
+                          script: "sudo -u ansible tail -n 2 ${env.WORKING_DIR}/.ansible.log"
+                       )
+
+          if (output.contains("unreachable=0") && output.contains("failed=0")) {
+            sh "echo success"
+          } else {
+            error "ansible-playbook error\n$output"
+          }
+        }
+      }
+    }
+  }
+}
