@@ -44,7 +44,7 @@ pipeline {
 
     stage('Create and configure ansible-playbook shellscript file') {
       steps {
-        sh "sudo -u ansible git clone https://github.com/TomonoriMatsumura/jenkinsfiles ${env.WORKING_DIR}/jenkinsfiles -b topic"
+        sh "sudo -u ansible git clone https://github.com/TomonoriMatsumura/tmp_jsfiles ${env.WORKING_DIR}/jenkinsfiles -b topic"
 
         sh "sudo -u ansible sed -i -e \"s#/WORKDIR#${env.WORKING_DIR}#g\" ${env.PLAYBOOK}"
 
